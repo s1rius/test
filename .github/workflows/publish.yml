@@ -1,0 +1,27 @@
+name: Publish-Test
+
+on: workflow_dispatch
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v3
+    - name: Mkdir
+      run: mkdir -p upload
+    - name: Write sha  
+      run: echo ${{ github.sha }} > upload/world.txt
+    - name: Get latest git tag
+      run: |
+        git fetch --tags
+        LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+        echo "LATEST_TAG=$LATEST_TAG" >> $GITHUB_ENV
+        echo "Latest git tag: $LATEST_TAG"
+    - uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ env.LATEST_TAG }}
+        name: ios_${{ env.LATEST_TAG }}.xcframework
+        files: | 
+          upload/*
