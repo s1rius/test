@@ -1,0 +1,19 @@
+name: Publish-Test
+
+on: workflow_dispatch
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v3
+    - run: mkdir -p upload
+    - run: echo hello > upload/world.txt
+    - uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ github.ref_name }}
+        name: ios_${{ github.ref_name }}.xcframework
+        files: | 
+          upload/world.txt
