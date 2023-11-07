@@ -1,0 +1,22 @@
+name: Publish-Test
+
+on: workflow_dispatch
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v3
+    - run: mkdir -p upload
+    - run: echo hello > upload/world.txt
+    - run: |
+      LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
+      echo "TAG_NAME=$LATEST_TAG" >> $GITHUB_ENV
+    - uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ env.TAG_NAME }}
+        name: ios_${{  github.ref_name }}.xcframework
+        files: | 
+          upload/world.txt
