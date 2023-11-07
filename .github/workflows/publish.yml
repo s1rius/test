@@ -1,0 +1,22 @@
+name: Publish-Test
+
+on: workflow_dispatch
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+    - uses: actions/checkout@v3
+    - run: mkdir -p upload
+    - run: echo ${{ github.sha }} > upload/world.txt
+    - name: 'Get Previous tag'
+        id: previoustag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+    - uses: softprops/action-gh-release@v1
+      with:
+        tag_name: ${{ steps.previoustag.outputs.tag }}
+        name: ios_${{ steps.previoustag.outputs.tag }}.xcframework
+        files: | 
+          upload/world.txt
